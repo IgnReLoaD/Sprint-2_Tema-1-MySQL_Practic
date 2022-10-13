@@ -110,3 +110,65 @@ SELECT * FROM Departamento;
 SELECT * FROM curso_escolar;
 SELECT * FROM grado;
 SELECT * FROM alumno_se_matricula_asignatura;
+
+-- Resol les 6 següents consultes utilitzant les clàusules LEFT JOIN i RIGHT JOIN.
+USE UNIVERSIDAD;
+
+-- 01. Retorna un llistat amb els noms de tots els professors/es i els departaments que tenen vinculats/des. 
+--     El llistat també ha de mostrar aquells professors/es que no tenen cap departament associat. 
+--     El llistat ha de retornar quatre columnes, nom del departament, primer cognom, segon cognom i nom del professor/a. 
+--     El resultat estarà ordenat alfabèticament de menor a major pel nom del departament, cognoms i el nom.
+SHOW COLUMNS FROM Persona;
+INSERT INTO Persona VALUES (25, '36525544J', 'Ruben', 'Alcalde', 'Presidente', 'SantaKo', 'Pza.Singerlin n.15', '666999666', '1985/02/25', 'H', 'profesor');
+SELECT * FROM Persona;
+SELECT DPT.nombre AS 'Departament', 
+       PER.apellido1 AS 'Primer cognom', 
+       PER.apellido2 AS 'Segon cognom', 
+       PER.nombre AS 'Nom' 
+       FROM Persona PER 
+           LEFT JOIN Profesor PRF ON PER.id = PRF.id_profesor 
+           LEFT JOIN Departamento DPT ON PRF.id_departamento = DPT.id 
+       WHERE PER.tipo = 'profesor' 
+       ORDER BY DPT.nombre, PER.apellido1, PER.apellido2, PER.nombre ASC;
+
+
+-- 02. Retorna un llistat amb els professors/es que no estan associats a un departament.
+SELECT CONCAT(PER.apellido1, ' ', PER.apellido2, ', ', PER.nombre) AS 'Nom_Professor'
+       -- , PRF.id_departamento                                            --  <-- descomentar aquesta línea per testejar
+	   FROM Persona PER
+            LEFT JOIN Profesor PRF ON PER.id = PRF.id_profesor
+            -- RIGHT JOIN Departamento DPT ON PRF.id_departamento = DPT.id
+		WHERE PER.tipo = 'profesor'
+        AND PRF.id_departamento IS NULL
+		ORDER BY Nom_Professor;
+
+
+-- 03. Retorna un llistat amb els departaments que no tenen professors/es associats.
+SELECT DPT.nombre AS 'Departaments_orfas'
+       -- , PER.apellido1
+       FROM Departamento DPT, Persona PER 
+            LEFT JOIN Profesor PRF ON PRF.id_departamento = DPT.id
+		WHERE PRF.id_profesor IS NULL;
+        
+
+-- 04. Retorna un llistat amb els professors/es que no imparteixen cap assignatura.
+SELECT CONCAT(PER.apellido1, ' ', PER.apellido2, ', ', PER.nombre) AS 'Professor (sense assignatura)'
+       FROM Persona PER 
+            LEFT JOIN Profesor PRF ON PER.id = PRF.id_profesor 
+            LEFT JOIN Asignatura ASG ON PRF.id_profesor = ASG.id_profesor 
+            WHERE ASG.id IS NULL 
+            AND PER.tipo='profesor';
+
+-- 05. Retorna un llistat amb les assignatures que no tenen un professor/a assignat.
+SELECT ASG.nombre AS 'Assignatura' 
+       FROM Profesor PRF 
+       RIGHT JOIN Asignatura ASG ON PRF.id_profesor = ASG.id_profesor 
+       WHERE ASG.id_profesor IS NULL;
+
+-- 06. Retorna un llistat amb tots els departaments que no han impartit assignatures en cap curs escolar.
+SELECT DISTINCT DPT.nombre AS 'Departament' 
+       FROM Departamento DPT 
+       LEFT JOIN Profesor PRF ON DPT.id = PRF.id_departamento 
+       LEFT JOIN Asignatura ASG ON PRF.id_profesor = ASG.id_profesor 
+       WHERE ASG.id_profesor IS NULL;
+
