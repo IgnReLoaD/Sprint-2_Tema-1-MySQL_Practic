@@ -229,30 +229,55 @@ SELECT P.nombre AS 'Nom de Producte',
        WHERE F.codigo = P.codigo_fabricante
        AND P.codigo_fabricante = 2;
 
--- 37. Retorna totes les dades dels productes que tenen el mateix preu que el producte més car del fabricant Lenovo. (Sense fer servir INNER JOIN).
-DECLARE @maxPrecioLenovo varchar(60); 
-
-SELECT @maxPrecioLenovo = MAX(P.Precio) FROM Producto P WHERE P.codigo_fabricante=2;
+-- 37. Retorna totes les dades dels productes que tenen el mateix preu que el producte més car del fabricant Lenovo. (Sense fer servir INNER JOIN).     
+USE TIENDA;
 SELECT P.* 
        FROM Producto P
-       WHERE P.precio = @maxPrecioLenovo;     --  559€
-
-	
-       
--- WHERE precio = (SELECT max(precio) FROM tienda.producto, tienda.fabricante 
--- WHERE tienda.fabricante.codigo = tienda.producto.codigo_fabricante AND tienda.fabricante.nombre = 'Lenovo');
+       WHERE P.precio = (SELECT MAX(P.Precio) 
+								FROM Producto P
+                                WHERE P.codigo_fabricante=2);
+                                
+-- 37. versión mejorada con variables:
+SET @maxPrecioLenovo = (SELECT MAX(P.Precio) 
+								FROM Producto P
+                                WHERE P.codigo_fabricante=2);        --  559€       
+SELECT P.* 
+       FROM Producto P
+       WHERE P.precio = @maxPrecioLenovo;     --  559€       
 
 -- 38. Llista el nom del producte més car del fabricant Lenovo.
+SELECT P.nombre AS 'Nom de Producte'
+       FROM Producto P 
+       WHERE P.precio = @maxPrecioLenovo;     --  559€          
 
 -- 39. Llista el nom del producte més barat del fabricant Hewlett-Packard.
+SET @minPrecioHewlett = (SELECT MIN(P.Precio) 
+								FROM Producto P
+                                WHERE P.codigo_fabricante=3);    -- 59,99€
 
+SELECT P.nombre AS 'Nom de Producte'
+       FROM Producto P 
+       WHERE P.precio = @minPrecioHewlett;     --  59,99€ 
+       
 -- 40. Retorna tots els productes de la base de dades que tenen un preu major o igual al producte més car del fabricant Lenovo.
+SELECT P.nombre AS 'Nom de Producte',
+       P.precio AS 'Preu de Producte'         --   <-- no ho demanen, només és per comprobar que retorna els correctes 
+       FROM Producto P 
+       WHERE P.precio >= @maxPrecioLenovo;    --  igual o més car que 559€
 
 -- 41. Llesta tots els productes del fabricant Asus que tenen un preu superior al preu mitjà de tots els seus productes.
+SET @precioMedio = (SELECT TRUNCATE(AVG(precio),2) 
+                           FROM Producto);
+                           
+SELECT @precioMedio AS 'Preu mitjà';      --   <-- como un echo de php, per veure que retorna de preu mitjà: 271,72€
 
+SELECT P.nombre AS 'Nom de Producte',
+       P.precio AS 'Preu de Producte'     --   <-- no ho demanen, només és per comprobar que retorna els correctes 
+       FROM Producto P 
+       WHERE P.codigo_fabricante = 1      --  no retorna cap producte, és correcte. Podem comprobar si posem codigo_fabricante = 2 (Lenovo) sí que en retornaria
+       AND P.precio > @precioMedio;       --  més car que preu mitjà de tots productes:  271,723€
 
-
-
+-- 00. Consulta de proves necessària per anar mirant els valors reals de BD, mentres elaborem les consultes demanades:
 SELECT P.nombre AS 'Nom de Producte',
        P.precio AS 'Preu de Producte',
        F.codigo AS 'Codi de Fabricant',
