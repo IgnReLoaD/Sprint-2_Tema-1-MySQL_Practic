@@ -11,5 +11,31 @@ SELECT apellido1 AS 'Primer cognom',
        WHERE tipo='alumno';
 
 -- 2. Esbrina el nom i els dos cognoms dels/les alumnes que no han donat d'alta el seu número de telèfon en la base de dades.
+SELECT nombre AS 'Nom', 
+       CONCAT(apellido1, ' ', apellido2) AS 'Cognoms'
+       FROM Persona 
+       WHERE tipo = 'alumno' 
+       AND telefono IS NULL;
 
--- SELECT 
+-- 3. Retorna el llistat dels/les alumnes que van néixer en 1999.
+SELECT CONCAT(apellido1, ' ', apellido2) AS 'Cognoms',
+       nombre AS 'Nom',
+       fecha_nacimiento AS 'Naixement'       --    <-- no ho demanen però només és per comprobar que retorna els correctes
+       FROM Persona 
+       WHERE tipo = 'alumno' 
+       AND Persona.fecha_nacimiento BETWEEN '1999-01-01' AND '1999-12-31';
+
+-- 4. Retorna el llistat de professors/es que no han donat d'alta el seu número de telèfon en la base de dades i a més el seu NIF acaba en K.
+SELECT nombre AS 'Nom', 
+       CONCAT(apellido1, ' ', apellido2) AS 'Cognoms',
+       nif AS 'NIF',
+       telefono AS 'Telf.'
+       FROM Persona 
+       WHERE tipo = 'profesor' 
+       AND telefono IS NULL
+       AND nif like '%K';
+
+-- 5. Retorna el llistat de les assignatures que s'imparteixen en el primer quadrimestre, en el tercer curs del grau que té l'identificador 7.
+
+
+
