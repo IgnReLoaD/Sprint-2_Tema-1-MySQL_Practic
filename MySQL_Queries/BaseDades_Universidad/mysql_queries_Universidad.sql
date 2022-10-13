@@ -36,6 +36,16 @@ SELECT nombre AS 'Nom',
        AND nif like '%K';
 
 -- 5. Retorna el llistat de les assignatures que s'imparteixen en el primer quadrimestre, en el tercer curs del grau que té l'identificador 7.
+SELECT nombre AS 'Nom Assignatura'
+       -- ,cuatrimestre AS 'cuatrim',       --   <-- descomentar per debugar-comprobar resultats correctes
+       -- curso AS 'Curs',
+       -- id_grado AS 'Grau'
+       FROM Asignatura
+       WHERE cuatrimestre=1
+       AND curso=3
+       AND id_grado=7;
 
 
-
+-- 00. Consulta de proves necessària per anar mirant els valors reals de BD, mentres elaborem les consultes demanades:
+SELECT * FROM Persona;
+SELECT * FROM Asignatura;
